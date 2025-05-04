@@ -1,0 +1,369 @@
+// Initialize AOS (Animate On Scroll) dan semua konfigurasi
+document.addEventListener('DOMContentLoaded', function() {
+  // Inisialisasi AOS dengan konfigurasi yang sudah disesuaikan
+  let aosConfig = {
+    duration: 800,
+    easing: 'ease-in-out',
+    once: true,
+    mirror: false
+  };
+  
+  // Reduce animation duration on mobile for better performance
+  if (window.innerWidth < 768) {
+    aosConfig.duration = 600;
+  }
+  
+  AOS.init(aosConfig);
+  
+  // Setup semua fungsi
+  setupDarkModeToggle();
+  setupContactForm();
+  setupSmoothScroll();
+  setupNavbarHighlight();
+  setupCardHoverEffects();
+  setupMobileOptimizations();
+});
+
+// Fungsi untuk toggle dark mode dengan transisi warna yang lebih halus
+function toggleDarkMode() {
+  const body = document.body;
+  
+  // Add transition for color changes
+  document.documentElement.style.transition = 'color 0.3s ease, background-color 0.3s ease';
+  
+  body.classList.toggle('dark-mode');
+  
+  const themeToggle = document.getElementById('themeToggle');
+  if (body.classList.contains('dark-mode')) {
+    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    localStorage.setItem('darkMode', 'enabled');
+  } else {
+    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+    localStorage.setItem('darkMode', 'disabled');
+  }
+  
+  // Remove transition after switching to avoid affecting other animations
+  setTimeout(() => {
+    document.documentElement.style.transition = '';
+  }, 300);
+}
+
+// Fungsi untuk mengecek status dark mode dari localStorage
+function checkDarkMode() {
+  const darkModeStatus = localStorage.getItem('darkMode');
+  const themeToggle = document.getElementById('themeToggle');
+  
+  if (darkModeStatus === 'enabled') {
+    document.body.classList.add('dark-mode');
+    themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+  } else {
+    themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+  }
+}
+
+// Setup dark mode toggle
+function setupDarkModeToggle() {
+  const themeToggle = document.getElementById('themeToggle');
+  
+  if (themeToggle) {
+    // Tambahkan event listener ke tombol toggle
+    themeToggle.addEventListener('click', toggleDarkMode);
+    
+    // Periksa preferensi dark mode yang tersimpan
+    checkDarkMode();
+    
+    // Jika belum ada preferensi, gunakan preferensi sistem
+    if (!localStorage.getItem('darkMode')) {
+      const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+      if (prefersDarkScheme.matches) {
+        document.body.classList.add('dark-mode');
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        localStorage.setItem('darkMode', 'enabled');
+      }
+    }
+  }
+}
+
+// Setup Contact Form
+function setupContactForm() {
+  const contactForm = document.getElementById('contactForm');
+  
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Validasi form sebelum submit
+      if (!validateForm()) {
+        return;
+      }
+      
+      // Dapatkan nilai dari form
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const subject = document.getElementById('subject').value;
+      const message = document.getElementById('message').value;
+      
+      // Untuk demo, tampilkan alert bahwa pesan telah dikirim
+      alert(`Terima kasih ${name}! Pesan Anda telah dikirim dan akan segera dibalas.`);
+      
+      // Reset form
+      contactForm.reset();
+      
+      // Di implementasi nyata, Anda akan mengirim data ke server di sini
+      // menggunakan fetch API atau metode lainnya
+    });
+  }
+}
+
+// Validasi form sebelum submit
+function validateForm() {
+  let isValid = true;
+  const name = document.getElementById('name');
+  const email = document.getElementById('email');
+  const subject = document.getElementById('subject');
+  const message = document.getElementById('message');
+  
+  // Validasi nama
+  if (name.value.trim() === '') {
+    setInvalidFeedback(name, 'Silakan masukkan nama Anda');
+    isValid = false;
+  } else {
+    removeInvalidFeedback(name);
+  }
+  
+  // Validasi email
+  if (email.value.trim() === '') {
+    setInvalidFeedback(email, 'Silakan masukkan alamat email Anda');
+    isValid = false;
+  } else if (!isValidEmail(email.value)) {
+    setInvalidFeedback(email, 'Silakan masukkan alamat email yang valid');
+    isValid = false;
+  } else {
+    removeInvalidFeedback(email);
+  }
+  
+  // Validasi subjek
+  if (subject.value.trim() === '') {
+    setInvalidFeedback(subject, 'Silakan masukkan subjek pesan');
+    isValid = false;
+  } else {
+    removeInvalidFeedback(subject);
+  }
+  
+  // Validasi pesan
+  if (message.value.trim() === '') {
+    setInvalidFeedback(message, 'Silakan masukkan pesan Anda');
+    isValid = false;
+  } else {
+    removeInvalidFeedback(message);
+  }
+  
+  return isValid;
+}
+
+// Helper untuk memvalidasi format email
+function isValidEmail(email) {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
+// Helper untuk menampilkan pesan error
+function setInvalidFeedback(input, message) {
+  input.classList.add('is-invalid');
+  
+  // Cek apakah sudah ada pesan error
+  let feedback = input.nextElementSibling;
+  if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+    feedback = document.createElement('div');
+    feedback.classList.add('invalid-feedback');
+    input.parentNode.insertBefore(feedback, input.nextSibling);
+  }
+  
+  feedback.textContent = message;
+}
+
+// Helper untuk menghapus pesan error
+function removeInvalidFeedback(input) {
+  input.classList.remove('is-invalid');
+  const feedback = input.nextElementSibling;
+  if (feedback && feedback.classList.contains('invalid-feedback')) {
+    feedback.textContent = '';
+  }
+}
+
+// Setup smooth scroll untuk navigasi
+function setupSmoothScroll() {
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const targetId = this.getAttribute('href');
+      const targetElement = document.querySelector(targetId);
+      
+      if (targetElement) {
+        // Adjusted scroll offset for mobile
+        const offset = window.innerWidth < 768 ? 60 : 70;
+        
+        window.scrollTo({
+          top: targetElement.offsetTop - offset,
+          behavior: 'smooth'
+        });
+        
+        // Tutup navbar collapses pada perangkat mobile
+        const navbarToggler = document.querySelector('.navbar-toggler');
+        const navbarCollapse = document.querySelector('.navbar-collapse');
+        if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+          navbarToggler.click();
+        }
+      }
+    });
+  });
+}
+
+// Setup highlighting untuk item navigasi berdasarkan scroll position
+function setupNavbarHighlight() {
+  window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    let current = '';
+    
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.clientHeight;
+      // Adjust threshold for smaller screens
+      const threshold = window.innerWidth < 768 ? 70 : 100;
+      
+      if (pageYOffset >= (sectionTop - threshold)) {
+        current = section.getAttribute('id');
+      }
+    });
+    
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === `#${current}`) {
+        link.classList.add('active');
+      }
+    });
+    
+    // Toggle navbar background based on scroll position
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+      if (window.scrollY > 50) {
+        navbar.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.1)';
+      } else {
+        navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+      }
+    }
+  });
+}
+
+// Setup card hover effects
+function setupCardHoverEffects() {
+  // Enhance card hover effects
+  const cards = document.querySelectorAll('.card');
+  
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+    });
+  });
+}
+
+// Tambahan fungsi untuk memperbaiki tampilan mobile
+function setupMobileOptimizations() {
+  // Memperbaiki masalah navbar collapse pada mobile
+  const navbarToggler = document.querySelector('.navbar-toggler');
+  const navLinks = document.querySelectorAll('.nav-link');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', function() {
+      const navbarCollapse = document.querySelector('.navbar-collapse');
+      if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+        navbarToggler.click();
+      }
+    });
+  });
+  
+  // Optimasi AOS untuk mobile (mengurangi animasi untuk performa lebih baik)
+  if (window.innerWidth < 768) {
+    document.querySelectorAll('[data-aos]').forEach(item => {
+      // Reduce animation duration for better performance
+      if (item.getAttribute('data-aos-duration')) {
+        const currentDuration = parseInt(item.getAttribute('data-aos-duration'));
+        item.setAttribute('data-aos-duration', Math.min(currentDuration, 600).toString());
+      }
+      
+      // Reduce delay times for better mobile experience
+      if (item.getAttribute('data-aos-delay')) {
+        const currentDelay = parseInt(item.getAttribute('data-aos-delay'));
+        if (currentDelay > 300) {
+          item.setAttribute('data-aos-delay', '200');
+        }
+      }
+    });
+  }
+  
+  // Menyesuaikan padding navbar pada scroll untuk layar kecil
+  if (window.innerWidth < 576) {
+    const navbar = document.querySelector('.navbar');
+    if (navbar) {
+      window.addEventListener('scroll', function() {
+        if (window.scrollY > 20) {
+          navbar.style.padding = '0.5rem 0';
+        } else {
+          navbar.style.padding = '0.75rem 0';
+        }
+      });
+    }
+  }
+  
+  // Fix untuk tampilan formulir pada mobile
+  adjustFormLabelsOnMobile();
+  
+  // Mengoptimalkan animasi berdasarkan kemampuan perangkat
+  optimizeAnimationsForDevice();
+}
+
+// Helper function untuk menyesuaikan label formulir pada mobile
+function adjustFormLabelsOnMobile() {
+  if (window.innerWidth < 576) {
+    const formFloatingLabels = document.querySelectorAll('.form-floating > label');
+    formFloatingLabels.forEach(label => {
+      label.style.fontSize = '0.85rem';
+    });
+  }
+}
+
+// Helper function untuk mengoptimalkan animasi
+function optimizeAnimationsForDevice() {
+  // Cek kapabilitas perangkat
+  const isLowEndDevice = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+  
+  if (window.innerWidth < 768 || isLowEndDevice) {
+    // Kurangi animasi pada perangkat berkemampuan rendah
+    document.querySelectorAll('.animate-float').forEach(el => {
+      el.style.animationDuration = '4s'; // Slower animation to save resources
+    });
+    
+    // Matikan beberapa animasi jika perangkat berkemampuan sangat rendah
+    if (isLowEndDevice) {
+      document.querySelectorAll('.animate-pop').forEach(el => {
+        el.classList.remove('animate-pop');
+      });
+    }
+  }
+}
+
+// Event handling untuk resize window
+window.addEventListener('resize', function() {
+  // Delay execution to avoid excess calculations during resize
+  clearTimeout(window.resizeTimeout);
+  window.resizeTimeout = setTimeout(function() {
+    adjustFormLabelsOnMobile();
+  }, 250);
+});
