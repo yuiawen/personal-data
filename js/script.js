@@ -1,6 +1,4 @@
-// Initialize AOS (Animate On Scroll) dan semua konfigurasi
 document.addEventListener('DOMContentLoaded', function() {
-  // Inisialisasi AOS dengan konfigurasi yang sudah disesuaikan
   let aosConfig = {
     duration: 800,
     easing: 'ease-in-out',
@@ -8,14 +6,12 @@ document.addEventListener('DOMContentLoaded', function() {
     mirror: false
   };
   
-  // Reduce animation duration on mobile for better performance
   if (window.innerWidth < 768) {
     aosConfig.duration = 600;
   }
   
   AOS.init(aosConfig);
   
-  // Setup semua fungsi
   setupDarkModeToggle();
   setupContactForm();
   setupSmoothScroll();
@@ -24,11 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
   setupMobileOptimizations();
 });
 
-// Fungsi untuk toggle dark mode dengan transisi warna yang lebih halus
 function toggleDarkMode() {
   const body = document.body;
   
-  // Add transition for color changes
   document.documentElement.style.transition = 'color 0.3s ease, background-color 0.3s ease';
   
   body.classList.toggle('dark-mode');
@@ -42,13 +36,11 @@ function toggleDarkMode() {
     localStorage.setItem('darkMode', 'disabled');
   }
   
-  // Remove transition after switching to avoid affecting other animations
   setTimeout(() => {
     document.documentElement.style.transition = '';
   }, 300);
 }
 
-// Fungsi untuk mengecek status dark mode dari localStorage
 function checkDarkMode() {
   const darkModeStatus = localStorage.getItem('darkMode');
   const themeToggle = document.getElementById('themeToggle');
@@ -61,18 +53,14 @@ function checkDarkMode() {
   }
 }
 
-// Setup dark mode toggle
 function setupDarkModeToggle() {
   const themeToggle = document.getElementById('themeToggle');
   
   if (themeToggle) {
-    // Tambahkan event listener ke tombol toggle
     themeToggle.addEventListener('click', toggleDarkMode);
     
-    // Periksa preferensi dark mode yang tersimpan
     checkDarkMode();
     
-    // Jika belum ada preferensi, gunakan preferensi sistem
     if (!localStorage.getItem('darkMode')) {
       const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
       if (prefersDarkScheme.matches) {
@@ -84,7 +72,6 @@ function setupDarkModeToggle() {
   }
 }
 
-// Setup Contact Form
 function setupContactForm() {
   const contactForm = document.getElementById('contactForm');
   
@@ -92,30 +79,22 @@ function setupContactForm() {
     contactForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
-      // Validasi form sebelum submit
       if (!validateForm()) {
         return;
       }
       
-      // Dapatkan nilai dari form
       const name = document.getElementById('name').value;
       const email = document.getElementById('email').value;
       const subject = document.getElementById('subject').value;
       const message = document.getElementById('message').value;
       
-      // Untuk demo, tampilkan alert bahwa pesan telah dikirim
       alert(`Terima kasih ${name}! Pesan Anda telah dikirim dan akan segera dibalas.`);
       
-      // Reset form
       contactForm.reset();
-      
-      // Di implementasi nyata, Anda akan mengirim data ke server di sini
-      // menggunakan fetch API atau metode lainnya
     });
   }
 }
 
-// Validasi form sebelum submit
 function validateForm() {
   let isValid = true;
   const name = document.getElementById('name');
@@ -123,7 +102,6 @@ function validateForm() {
   const subject = document.getElementById('subject');
   const message = document.getElementById('message');
   
-  // Validasi nama
   if (name.value.trim() === '') {
     setInvalidFeedback(name, 'Silakan masukkan nama Anda');
     isValid = false;
@@ -131,7 +109,6 @@ function validateForm() {
     removeInvalidFeedback(name);
   }
   
-  // Validasi email
   if (email.value.trim() === '') {
     setInvalidFeedback(email, 'Silakan masukkan alamat email Anda');
     isValid = false;
@@ -142,7 +119,6 @@ function validateForm() {
     removeInvalidFeedback(email);
   }
   
-  // Validasi subjek
   if (subject.value.trim() === '') {
     setInvalidFeedback(subject, 'Silakan masukkan subjek pesan');
     isValid = false;
@@ -150,7 +126,6 @@ function validateForm() {
     removeInvalidFeedback(subject);
   }
   
-  // Validasi pesan
   if (message.value.trim() === '') {
     setInvalidFeedback(message, 'Silakan masukkan pesan Anda');
     isValid = false;
@@ -161,17 +136,14 @@ function validateForm() {
   return isValid;
 }
 
-// Helper untuk memvalidasi format email
 function isValidEmail(email) {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
 }
 
-// Helper untuk menampilkan pesan error
 function setInvalidFeedback(input, message) {
   input.classList.add('is-invalid');
   
-  // Cek apakah sudah ada pesan error
   let feedback = input.nextElementSibling;
   if (!feedback || !feedback.classList.contains('invalid-feedback')) {
     feedback = document.createElement('div');
@@ -182,7 +154,6 @@ function setInvalidFeedback(input, message) {
   feedback.textContent = message;
 }
 
-// Helper untuk menghapus pesan error
 function removeInvalidFeedback(input) {
   input.classList.remove('is-invalid');
   const feedback = input.nextElementSibling;
@@ -191,7 +162,6 @@ function removeInvalidFeedback(input) {
   }
 }
 
-// Setup smooth scroll untuk navigasi
 function setupSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
@@ -201,7 +171,6 @@ function setupSmoothScroll() {
       const targetElement = document.querySelector(targetId);
       
       if (targetElement) {
-        // Adjusted scroll offset for mobile
         const offset = window.innerWidth < 768 ? 60 : 70;
         
         window.scrollTo({
@@ -209,7 +178,6 @@ function setupSmoothScroll() {
           behavior: 'smooth'
         });
         
-        // Tutup navbar collapses pada perangkat mobile
         const navbarToggler = document.querySelector('.navbar-toggler');
         const navbarCollapse = document.querySelector('.navbar-collapse');
         if (navbarCollapse && navbarCollapse.classList.contains('show')) {
@@ -220,7 +188,6 @@ function setupSmoothScroll() {
   });
 }
 
-// Setup highlighting untuk item navigasi berdasarkan scroll position
 function setupNavbarHighlight() {
   window.addEventListener('scroll', function() {
     const sections = document.querySelectorAll('section');
@@ -231,7 +198,6 @@ function setupNavbarHighlight() {
     sections.forEach(section => {
       const sectionTop = section.offsetTop;
       const sectionHeight = section.clientHeight;
-      // Adjust threshold for smaller screens
       const threshold = window.innerWidth < 768 ? 70 : 100;
       
       if (pageYOffset >= (sectionTop - threshold)) {
@@ -246,7 +212,6 @@ function setupNavbarHighlight() {
       }
     });
     
-    // Toggle navbar background based on scroll position
     const navbar = document.querySelector('.navbar');
     if (navbar) {
       if (window.scrollY > 50) {
@@ -258,9 +223,7 @@ function setupNavbarHighlight() {
   });
 }
 
-// Setup card hover effects
 function setupCardHoverEffects() {
-  // Enhance card hover effects
   const cards = document.querySelectorAll('.card');
   
   cards.forEach(card => {
@@ -274,9 +237,7 @@ function setupCardHoverEffects() {
   });
 }
 
-// Tambahan fungsi untuk memperbaiki tampilan mobile
 function setupMobileOptimizations() {
-  // Memperbaiki masalah navbar collapse pada mobile
   const navbarToggler = document.querySelector('.navbar-toggler');
   const navLinks = document.querySelectorAll('.nav-link');
   
@@ -289,16 +250,13 @@ function setupMobileOptimizations() {
     });
   });
   
-  // Optimasi AOS untuk mobile (mengurangi animasi untuk performa lebih baik)
   if (window.innerWidth < 768) {
     document.querySelectorAll('[data-aos]').forEach(item => {
-      // Reduce animation duration for better performance
       if (item.getAttribute('data-aos-duration')) {
         const currentDuration = parseInt(item.getAttribute('data-aos-duration'));
         item.setAttribute('data-aos-duration', Math.min(currentDuration, 600).toString());
       }
       
-      // Reduce delay times for better mobile experience
       if (item.getAttribute('data-aos-delay')) {
         const currentDelay = parseInt(item.getAttribute('data-aos-delay'));
         if (currentDelay > 300) {
@@ -308,7 +266,6 @@ function setupMobileOptimizations() {
     });
   }
   
-  // Menyesuaikan padding navbar pada scroll untuk layar kecil
   if (window.innerWidth < 576) {
     const navbar = document.querySelector('.navbar');
     if (navbar) {
@@ -322,14 +279,10 @@ function setupMobileOptimizations() {
     }
   }
   
-  // Fix untuk tampilan formulir pada mobile
   adjustFormLabelsOnMobile();
-  
-  // Mengoptimalkan animasi berdasarkan kemampuan perangkat
   optimizeAnimationsForDevice();
 }
 
-// Helper function untuk menyesuaikan label formulir pada mobile
 function adjustFormLabelsOnMobile() {
   if (window.innerWidth < 576) {
     const formFloatingLabels = document.querySelectorAll('.form-floating > label');
@@ -339,18 +292,14 @@ function adjustFormLabelsOnMobile() {
   }
 }
 
-// Helper function untuk mengoptimalkan animasi
 function optimizeAnimationsForDevice() {
-  // Cek kapabilitas perangkat
   const isLowEndDevice = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
   
   if (window.innerWidth < 768 || isLowEndDevice) {
-    // Kurangi animasi pada perangkat berkemampuan rendah
     document.querySelectorAll('.animate-float').forEach(el => {
-      el.style.animationDuration = '4s'; // Slower animation to save resources
+      el.style.animationDuration = '4s';
     });
     
-    // Matikan beberapa animasi jika perangkat berkemampuan sangat rendah
     if (isLowEndDevice) {
       document.querySelectorAll('.animate-pop').forEach(el => {
         el.classList.remove('animate-pop');
@@ -359,9 +308,7 @@ function optimizeAnimationsForDevice() {
   }
 }
 
-// Event handling untuk resize window
 window.addEventListener('resize', function() {
-  // Delay execution to avoid excess calculations during resize
   clearTimeout(window.resizeTimeout);
   window.resizeTimeout = setTimeout(function() {
     adjustFormLabelsOnMobile();
